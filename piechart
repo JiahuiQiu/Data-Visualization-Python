@@ -1,0 +1,61 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+# Parameters
+site_name = 'SH'          
+subject_name = 'OPT'       
+material_name = 'fiber'    
+month_each = 'Feb'        
+
+#####################################################################################
+
+# Read excel file
+excelFile = r'test.xlsx'
+df = pd.DataFrame(pd.read_excel(excelFile))
+
+# Select the parameters to make a subset of the original file
+df1= df[['Site', 'Material', 'Supplier', 'Month', 'Total']]
+df2 = df1.loc[df1['Month'] == month_each].dropna()    # drop missing value
+df3 = df2.loc[df2['Total'] < 80]
+print(df3)
+
+# rewrite the excel subset into a new sheet
+data = df3
+data.to_excel('Title-'+str(month_each)+'.xlsx')
+
+# List for pie chart plot
+countList = df3[['Site']].values.T.tolist()[:][0]
+count_SH = countList.count('SH')
+count_TN = countList.count('TN')
+
+# plot the pie chart
+label = ['SH'+', '+str(count_SH),'TN'+', '+str(count_TN)] 
+label_legend = ['SH','TN'] 
+color = ['steelblue','orange']                            
+sizes = count_SH, count_TN
+explode=0,0
+
+plt.figure(figsize = (9, 6))
+
+plt.pie(
+    sizes,
+    labels=label,
+    colors=color,
+    startangle=100,
+    textprops={'fontsize':16, 'color':'black'},
+    shadow=True,
+    explode=explode,
+    autopct='%1.1f%%',
+)
+
+plt.legend(labels=label_legend,
+          fontsize = 10,
+          title = 'Site',
+          loc = 'center right',
+          bbox_to_anchor = (1, 0.2))
+
+
+plt.title(u'Title-'+month_each, fontsize=22)
+plt.savefig('Title-'+month_each+'.JPG')
+plt.show()
